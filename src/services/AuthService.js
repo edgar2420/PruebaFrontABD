@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/auth";
+const API_URL = "https://pruebasubidabd.onrender.com/auth";
 
 export const login = async (email, password) => {
   try {
