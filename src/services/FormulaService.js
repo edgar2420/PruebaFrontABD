@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/formulas";
 
 export const getFormulasPorProducto = async (nombre) => {
-    const response = await axios.get(`https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/formulas/producto/${encodeURIComponent(nombre)}`);
+    const response = await axios.get(`https://pruebasubidabd.onrender.com/formulas/producto/${encodeURIComponent(nombre)}`);
     return response.data;
   };
   
@@ -20,7 +20,7 @@ export const subirExcelFormulas = async (archivo) => {
 };
 
 export const crearFormula = async (data) => {
-    const response = await axios.post("https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/formulas/crear", data);
+    const response = await axios.post("https://pruebasubidabd.onrender.com/formulas/crear", data);
     return response.data;
   };
   
