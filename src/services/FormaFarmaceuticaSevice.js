@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/forma-farmaceutica";
+const API_URL = "https://pruebasubidabd.onrender.com/forma-farmaceutica";
 
 // Obtener todas las formas farmacéuticas
 export const obtenerFormasFarmaceuticas = async () => {
