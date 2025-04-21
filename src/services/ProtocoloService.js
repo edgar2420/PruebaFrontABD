@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/protocolo";
+const API_URL = "https://pruebasubidabd.onrender.com/protocolo";
 
 // Obtener todos los protocolos (si luego los querés listar)
 export const obtenerProtocolos = async () => {
