@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/productos";
+const API_URL = "https://pruebasubidabd.onrender.com/productos";
 
 // Obtener todos los productos
 export const getProductos = async () => {
@@ -23,7 +23,7 @@ export const importarProductos = async (archivo) => {
   const formData = new FormData();
   formData.append("archivo", archivo);
 
-  const response = await axios.post("https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/productos/importar", formData, {
+  const response = await axios.post("https://pruebasubidabd.onrender.com/productos/importar", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -33,7 +33,7 @@ export const importarProductos = async (archivo) => {
 };
 
 export const obtenerDetalleProducto = async (nombreProducto) => {
-  const res = await axios.get(`http://localhost:3000/productos/detalle-formula/${encodeURIComponent(nombreProducto)}`);
+  const res = await axios.get(`https://pruebasubidabd.onrender.com/productos/detalle-formula/${encodeURIComponent(nombreProducto)}`);
   return res.data;
 };
 
@@ -50,6 +50,6 @@ export const buscarProductos = async (query) => {
 };
 
 export const obtenerEspecificacionesProducto = async (nombre) => {
-  const response = await axios.get(`https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/especificaciones/producto/${encodeURIComponent(nombre)}`)
+  const response = await axios.get(`https://pruebasubidabd.onrender.com/especificaciones/producto/${encodeURIComponent(nombre)}`)
   return response.data;
 };
