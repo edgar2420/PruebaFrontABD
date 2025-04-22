@@ -34,4 +34,9 @@ export const crearFormula = async (data) => {
     const response = await axios.delete(`${API_URL}/eliminar/${id}`);
     return response.data;
   };
+
+  export const getTodasLasFormulas = async () => {
+    const response = await axios.get(`${API_URL}/todas`);
+    return response.data;
+  };
   
