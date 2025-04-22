@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './FormLogin.css';
 import laboratoriosabd from './laboratoriosabd.png';
@@ -7,12 +8,13 @@ import laboratoriosabd from './laboratoriosabd.png';
 const FormLogin = () => {
   const [nombre, setNombre] = useState('');
   const [password, setPassword] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false); // 👁️ estado de visibilidad
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('https://pruebasubidabd.onrender.com/auth/login', {
         method: 'POST',
@@ -24,8 +26,6 @@ const FormLogin = () => {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        
-        
         if (data.role === 'admin') {
           navigate('/admin-dashboard', { state: { token: data.token } });
         } else if (data.role === 'publico') {
@@ -42,20 +42,18 @@ const FormLogin = () => {
   return (
     <div className="login-container">
       <div className="login-card">
-        
         <div className="logo-panel">
           <img src={laboratoriosabd} alt="Laboratorios ABD" className="logo-image" />
         </div>
 
-        
         <div className="form-panel">
           <div className="form-header">
             <h1>BIENVENIDO</h1>
             <h2>INICIAR SESIÓN</h2>
           </div>
-          
+
           {error && <div className="alert alert-danger">{error}</div>}
-          
+
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="usuario">Usuario:</label>
@@ -70,10 +68,10 @@ const FormLogin = () => {
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <label htmlFor="password">Contraseña:</label>
               <input
-                type="password"
+                type={mostrarPassword ? "text" : "password"}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -81,6 +79,18 @@ const FormLogin = () => {
                 required
                 className="form-control"
               />
+              <span
+                onClick={() => setMostrarPassword(!mostrarPassword)}
+                style={{
+                  position: 'absolute',
+                  top: '38px',
+                  right: '10px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                {mostrarPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
 
             <div className="button-container">
