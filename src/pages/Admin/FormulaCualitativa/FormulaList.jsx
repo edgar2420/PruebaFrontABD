@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { UploadOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import {
-  getFormulasPorProducto,
+  getTodasLasFormulas,
   subirExcelFormulas,
   crearFormula,
   eliminarFormula,
@@ -45,12 +45,8 @@ const FormulaList = () => {
       try {
         const productosData = await getProductos();
         setProductos(productosData);
-
-        const todas = [];
-        for (const p of productosData) {
-          const f = await getFormulasPorProducto(p.nombre);
-          todas.push(...f);
-        }
+  
+        const todas = await getTodasLasFormulas();
         setFormulas(todas);
         setTodasFormulas(todas);
       } catch (err) {
@@ -60,6 +56,7 @@ const FormulaList = () => {
     };
     cargarDatos();
   }, []);
+  
 
   const handleBuscar = (valor) => {
     setBusqueda(valor);
