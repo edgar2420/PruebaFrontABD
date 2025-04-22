@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://api.render.com/deploy/srv-d03atc0dl3ps73fim78g?key=4IBMgwAoeFQ/formulas";
+const API_URL = "https://pruebasubidabd.onrender.com/formulas";
 
 export const getFormulasPorProducto = async (nombre) => {
     const response = await axios.get(`https://pruebasubidabd.onrender.com/formulas/producto/${encodeURIComponent(nombre)}`);
