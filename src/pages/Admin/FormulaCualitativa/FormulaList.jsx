@@ -8,7 +8,9 @@ import {
   Modal,
   Form,
   Space,
-  message
+  message,
+  Pagination,
+  Select
 } from "antd";
 import { UploadOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import {
@@ -28,7 +30,6 @@ const FormulaList = () => {
   const navigate = useNavigate();
 
   const [formulas, setFormulas] = useState([]);
-  const [todasFormulas, setTodasFormulas] = useState([]);
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -39,33 +40,34 @@ const FormulaList = () => {
   const [busqueda, setBusqueda] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [totalFormulas, setTotalFormulas] = useState(0);
+  const [limitePorPagina] = useState(10);
+
+  const cargarDatos = async (pagina = 1) => {
+    setLoading(true);
+    try {
+      const productosData = await getProductos();
+      setProductos(productosData);
+
+      const res = await getTodasLasFormulas(pagina, limitePorPagina);
+      setFormulas(res?.data || []);
+      setTotalFormulas(res?.total || 0);
+      setPaginaActual(pagina);
+    } catch (err) {
+      console.error("❌ Error cargando datos:", err);
+      message.error("No se pudieron cargar las fórmulas o productos");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        const productosData = await getProductos();
-        setProductos(productosData);
-  
-        const todas = await getTodasLasFormulas();
-        setFormulas(todas);
-        setTodasFormulas(todas);
-      } catch (err) {
-        console.error("❌ Error cargando datos:", err);
-        message.error("No se pudieron cargar las fórmulas o productos");
-      }
-    };
     cargarDatos();
   }, []);
-  
 
   const handleBuscar = (valor) => {
     setBusqueda(valor);
-    if (!valor) return setFormulas(todasFormulas);
-
-    const filtradas = todasFormulas.filter(f =>
-      f.productoNombre.toLowerCase().includes(valor.toLowerCase())
-    );
-    setFormulas(filtradas);
   };
 
   const handleFileChange = async (info) => {
@@ -80,7 +82,7 @@ const FormulaList = () => {
     try {
       const result = await subirExcelFormulas(file);
       message.success(`Se importaron ${result?.formulas?.length || 0} fórmula(s) correctamente`);
-      window.location.reload();
+      cargarDatos(paginaActual);
     } catch (error) {
       const msg = error?.response?.data?.msg || "Error al importar archivo Excel";
       message.error(msg);
@@ -124,7 +126,7 @@ const FormulaList = () => {
       form.resetFields();
       setIsEdit(false);
       setFormulaEditId(null);
-      window.location.reload();
+      cargarDatos(paginaActual);
     } catch (error) {
       console.error("❌ Error al guardar fórmula:", error);
       message.error("No se pudo guardar la fórmula");
@@ -143,7 +145,7 @@ const FormulaList = () => {
     try {
       await eliminarFormula(id);
       message.success("Fórmula eliminada correctamente");
-      setFormulas(formulas.filter(f => f.id !== id));
+      cargarDatos(paginaActual);
     } catch (error) {
       console.error("❌ Error al eliminar fórmula:", error);
       message.error("No se pudo eliminar la fórmula");
@@ -157,18 +159,12 @@ const FormulaList = () => {
       <div className="main-content full-height">
         <header className="navbar">
           <div>
-            <FaBars
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              style={{ fontSize: '24px', cursor: 'pointer', marginRight: '20px' }}
-            />
+            <FaBars onClick={() => setIsSidebarOpen(!isSidebarOpen)} style={{ fontSize: '24px', cursor: 'pointer', marginRight: '20px' }} />
             <h1>Fórmulas Cuali-Cuantitativas</h1>
           </div>
 
           <div style={{ position: 'relative' }}>
-            <FaUser
-              style={{ fontSize: '24px', cursor: 'pointer', marginLeft: '20px' }}
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            />
+            <FaUser style={{ fontSize: '24px', cursor: 'pointer', marginLeft: '20px' }} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} />
             {isUserMenuOpen && (
               <div className="user-menu">
                 <button onClick={() => window.location.href = "/"}>Salir</button>
@@ -177,29 +173,16 @@ const FormulaList = () => {
           </div>
         </header>
 
-        <Card
-          style={{ margin: 20 }}
+        <Card style={{ margin: 20 }}
           extra={
             <Space>
-              <Input
-                placeholder="Buscar por producto"
-                prefix={<SearchOutlined />}
-                value={busqueda}
-                onChange={(e) => handleBuscar(e.target.value)}
-                style={{ width: 250 }}
-              />
-
-              <Upload
-                accept=".xlsx"
-                showUploadList={false}
-                customRequest={({ file, onSuccess }) => {
-                  handleFileChange({ file });
-                  setTimeout(() => onSuccess("ok"), 0);
-                }}
-              >
+              <Input placeholder="Buscar por producto" prefix={<SearchOutlined />} value={busqueda} onChange={(e) => handleBuscar(e.target.value)} style={{ width: 250 }} />
+              <Upload accept=".xlsx" showUploadList={false} customRequest={({ file, onSuccess }) => {
+                handleFileChange({ file });
+                setTimeout(() => onSuccess("ok"), 0);
+              }}>
                 <Button icon={<UploadOutlined />} loading={loading}>Subir Excel</Button>
               </Upload>
-
               <Button icon={<PlusOutlined />} onClick={() => {
                 setIsEdit(false);
                 form.resetFields();
@@ -222,7 +205,7 @@ const FormulaList = () => {
                 </tr>
               </thead>
               <tbody>
-                {formulas.map((formula, index) => (
+                {(formulas || []).filter(f => f.productoNombre.toLowerCase().includes(busqueda.toLowerCase())).map((formula, index) => (
                   <tr key={index}>
                     <td>{formula.productoNombre}</td>
                     <td>{formula.volumenNominal}</td>
@@ -232,24 +215,22 @@ const FormulaList = () => {
                       ))}
                     </td>
                     <td className="action-buttons-cell">
-                      <FaEdit
-                        className="icon-edit"
-                        style={{ color: '#007bff', cursor: 'pointer', marginRight: '12px' }}
-                        onClick={() => handleEditar(formula)}
-                        title="Editar"
-                      />
-                      <FaTrash
-                        className="icon-delete"
-                        style={{ color: '#dc3545', cursor: 'pointer' }}
-                        onClick={() => handleEliminar(formula.id)}
-                        title="Eliminar"
-                      />
+                      <FaEdit className="icon-edit" style={{ color: '#007bff', cursor: 'pointer', marginRight: '12px' }} onClick={() => handleEditar(formula)} title="Editar" />
+                      <FaTrash className="icon-delete" style={{ color: '#dc3545', cursor: 'pointer' }} onClick={() => handleEliminar(formula.id)} title="Eliminar" />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          <Pagination
+            current={paginaActual}
+            total={totalFormulas}
+            pageSize={limitePorPagina}
+            onChange={cargarDatos}
+            style={{ marginTop: 16, textAlign: 'right' }}
+          />
         </Card>
 
         <Modal
@@ -261,7 +242,11 @@ const FormulaList = () => {
         >
           <Form layout="vertical" form={form}>
             <Form.Item label="Producto" name="productoNombre" rules={[{ required: true, message: "Requerido" }]}> 
-              <Input placeholder="Nombre del producto" />
+              <Select placeholder="Selecciona un producto">
+                {productos.map(p => (
+                  <Select.Option key={p.id} value={p.nombre}>{p.nombre}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <label>Materias Primas:</label>
@@ -275,7 +260,7 @@ const FormulaList = () => {
             <Button type="link" onClick={handleAddMateriaPrima}>+ Agregar materia prima</Button>
           </Form>
         </Modal>
-      </div>
+      </div>  
     </div>
   );
 };
