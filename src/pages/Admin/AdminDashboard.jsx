@@ -108,7 +108,7 @@ const AdminDashboard = () => {
       const formData = new FormData();
       formData.append("archivo", files[0]);
 
-      const response = await fetch("http://localhost:3000/productos/importar", {
+      const response = await fetch("https://pruebasubidabd.onrender.com/productos/importar", {
         method: "POST",
         body: formData,
       });
